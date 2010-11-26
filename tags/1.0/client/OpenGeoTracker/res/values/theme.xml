@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="GiPS" parent="android:style/Theme.NoTitleBar">
-        <item name="android:buttonStyle">@style/cstButton</item>
-        <item name="android:imageButtonStyle">@style/cstImageButton</item>
-        <!-- item name="android:textViewStyle">@style/TextView</item  -->
-    </style>
-</resources>
