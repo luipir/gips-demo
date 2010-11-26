@@ -34,6 +34,7 @@ public class Utilities {
 		SimpleDateFormat dateformat = new SimpleDateFormat(ISO8601DATEFORMAT, Locale.getDefault());
 		try {
 			Date date = dateformat.parse(datestring);
+			// TODO check why I've to remove one hour!!!!
 			date.setHours(date.getHours()-1); // patch because I don't know why there is an hour more! ??????????????
 			calendar.setTime(date);
 		} catch (ParseException e) {
