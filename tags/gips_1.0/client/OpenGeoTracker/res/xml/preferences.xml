@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference android:key="key_id"
+		android:title="@string/key_id" android:summary="@string/key_id_summary" />
+	<EditTextPreference android:key="url" android:title="@string/url"
+		android:summary="@string/url_summary" android:defaultValue="http://opengeotracker.org/" />
+	<org.opengeotracker.android.preference.EditIntegerPreference
+		android:key="nint" android:title="@string/nint" android:summary="@string/nint_summary"
+		android:defaultValue="30" android:numeric="integer" />
+	<PreferenceScreen android:title="@string/offlinemode">
+		<CheckBoxPreference android:key="offlinemode_enable"
+			android:title="@string/offlinemode_enable" android:summary="@string/offlinemode_enable_summary"
+			android:defaultValue="false" />
+		<CheckBoxPreference android:key="neverdelete_enable"
+			android:title="@string/neverdelete_enable" android:summary="@string/neverdelete_enable_summary"
+			android:defaultValue="false" />
+	</PreferenceScreen>
+	<PreferenceScreen android:title="@string/vibrate_mode">
+		<CheckBoxPreference android:key="vibrate_enable"
+			android:title="@string/vibrate_enable" android:summary="@string/vibrate_enable_summary"
+			android:defaultValue="true" />
+		<org.opengeotracker.android.preference.EditIntegerPreference
+			android:key="vibrate_interval" android:title="@string/vibrate_interval" android:summary="@string/vibrate_interval_summary"
+			android:defaultValue="100" android:numeric="integer" />
+	</PreferenceScreen>
+	<org.opengeotracker.android.preference.EditIntegerPreference
+		android:key="chunk" android:title="@string/chunk" android:summary="@string/chunk_summary"
+		android:defaultValue="25" android:numeric="integer"/>
+	<CheckBoxPreference android:key="startupatboot"
+		android:title="@string/startupatboot" android:summary="@string/startupatboot_summary"
+		android:defaultValue="false" />
+	<ListPreference android:key="unit" android:title="@string/unit"
+		android:summary="@string/unit_summary" android:entries="@array/unitLabels"
+		android:entryValues="@array/unitValues" android:defaultValue="kilometers" />
+</PreferenceScreen>
