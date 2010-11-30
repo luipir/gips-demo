@@ -26,9 +26,8 @@
 	<string name="url_summary">The URL at which where the server application is
 		installed.</string>
 
-	<string name="nint">Update interval (seconds)</string>
-	<string name="nint_summary">How many seconds to wait between updating the
-		position.</string>
+	<string name="nint">Upload interval (seconds)</string>
+	<string name="nint_summary">How many seconds to wait to upload points.</string>
 
 	<string name="offlinemode">Offline mode</string>
 	<string name="offlinemode_enable">Enable offline mode</string>
