@@ -44,8 +44,8 @@ public class Observation extends Activity {
 			// vibrate?
 			if (vibratemode) {
 				Log.i(LOGTAG, "VIbRaTe.................");
+				vibrator.vibrate(40);
 			}
-			vibrator.vibrate(40);
 			
 	    	// get tag to recognise button
 	    	String buttoncode = (String) view.getTag();
