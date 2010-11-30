@@ -68,6 +68,7 @@ public class GeoLocationListener extends Thread implements LocationListener {
     String tag;
     String unit;
     String buttoncode;
+    boolean flushMode;
     boolean onePoint;
     LocationManager lm;
     Date lastTime = null;
@@ -92,7 +93,8 @@ public class GeoLocationListener extends Thread implements LocationListener {
     		String tag,
     		String unit, 
     		boolean onePoint,
-    		String buttoncode) {
+    		String buttoncode,
+    		boolean flushMode) {
 		this.activity = a;
 		this.lm = lm;
 		this.ctx = ctx;
@@ -102,6 +104,7 @@ public class GeoLocationListener extends Thread implements LocationListener {
 		this.tag = tag;
 		this.onePoint = onePoint;
 		this.buttoncode = buttoncode;
+		this.flushMode = flushMode;
 		this.count = 0;
 		this.isRunning = true;
 		this.lastlat = 0.0d;
@@ -132,7 +135,8 @@ public class GeoLocationListener extends Thread implements LocationListener {
 		dfs.setDecimalSeparator(Constants.DECIMAL_SEPARATOR);
 		df.setDecimalFormatSymbols(dfs);
     }
-
+    
+    // costructor to manage continuous tracking
     public GeoLocationListener(
     		Activity a, 
     		LocationManager lm, 
@@ -144,9 +148,10 @@ public class GeoLocationListener extends Thread implements LocationListener {
     		String unit,
     		boolean onePoint) {
     	initLocationListener(a, lm, ctx, key, interval, url, tag, unit,
-			onePoint, "-1");
+			onePoint, "-1", false);
     }
-
+    
+    // constructor to manage one point saving on local db
     public GeoLocationListener(
     		LocationManager lm, 
     		Context ctx, 
@@ -157,9 +162,21 @@ public class GeoLocationListener extends Thread implements LocationListener {
     		boolean onePoint,
     		String buttoncode) {
 		initLocationListener((Activity) null, lm, ctx, key, interval, url, tag,
-			(String) null, onePoint, buttoncode);
+			(String) null, onePoint, buttoncode, false);
     }
     
+    // constructor to manage DB flushing on remote db
+    public GeoLocationListener(
+    		Activity a, 
+    		LocationManager lm, 
+    		Context ctx,
+    		String key, 
+    		int interval, 
+    		String url) {
+    	initLocationListener(a, lm, ctx, key, interval, url, (String) null, (String) null,
+			false, "-1", true);
+    }
+
     // set connection status when connection state change receiving
     // Broadcast message
 	public class ConnectionChangeReceiver extends BroadcastReceiver {
@@ -226,6 +243,7 @@ public class GeoLocationListener extends Thread implements LocationListener {
 		if (loc == null) {
 		    Log.w(LOGTAG, "Location object loc == null, we have no location !");
 		} else {
+			/*
 		    Log.v(LOGTAG, "Received location, saving or sending it...");
 		    
 		    // check if we're allowed to upload the location
@@ -241,6 +259,8 @@ public class GeoLocationListener extends Thread implements LocationListener {
 		    } else {
 				success = saveToLocalStorage(loc, oneGiPSData);
 		    }
+		    */
+			success = saveToLocalStorage(loc, oneGiPSData);
 		}
 		return success;
     }
@@ -249,6 +269,9 @@ public class GeoLocationListener extends Thread implements LocationListener {
 	public boolean saveToLocalStorage(Location loc, GiPSExtraData oneGiPSData) {
 		boolean success = false;
 		
+		SharedPreferences mPrefs = ctx.getSharedPreferences(Constants.PREFERENCESFILE, Context.MODE_PRIVATE);
+		boolean vibratemode = mPrefs.getBoolean(Constants.VIBRATE_MODE, false);
+
 		// insert Location and GiPS data in DB
 		gipsdb.beginTransaction();
 		try {
@@ -285,7 +308,15 @@ public class GeoLocationListener extends Thread implements LocationListener {
 			gipsdb.setTransactionSuccessful();
 			success = true;
 			
+			// vibrate!
+			if (vibratemode) {
+				//int vibinterval = mPrefs.getInt(Constants.VIBRATE_INTERVAL, Constants.VIBRATE_DEFAULT_INTERVAL);
+				//vibrator.vibrate(vibinterval);
+			}
+
 		} catch(SQLException e) {
+			if (vibratemode) vibrator.vibrate(new long[]{50, 25, 50, 25, 50}, -1);
+
 			Toast.makeText(ctx, "Error saving point in DB: "+e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 		} finally {
@@ -318,8 +349,14 @@ public class GeoLocationListener extends Thread implements LocationListener {
      * @return
      */
 	public boolean flushLocalStorageToServer(boolean neverDelete) { 
-    	
-    	String sqlget;
+		
+		// exit immediatly if not connected of offline mode
+		if (!isconnected) return true;
+		if (ctx.getSharedPreferences(Constants.PREFERENCESFILE,
+			    Context.MODE_PRIVATE).getBoolean(Constants.OFFLINE_MODE,
+			    false)) return true;
+		
+		String sqlget;
     	String sqlupdate;
     	String sqlbutton;
     	
@@ -569,8 +606,8 @@ public class GeoLocationListener extends Thread implements LocationListener {
 				    
 				    // notify vibrating
 					if (vibratemode) {
-						int vibinterval = mPrefs.getInt(Constants.VIBRATE_INTERVAL, Constants.VIBRATE_DEFAULT_INTERVAL);
-						vibrator.vibrate(vibinterval);
+						//int vibinterval = mPrefs.getInt(Constants.VIBRATE_INTERVAL, Constants.VIBRATE_DEFAULT_INTERVAL);
+						//vibrator.vibrate(vibinterval);
 					}
 				} else {
 				    Log.w(LOGTAG, "HTTP POST failed with code "
@@ -677,11 +714,22 @@ public class GeoLocationListener extends Thread implements LocationListener {
 
     @Override
     public void onLocationChanged(Location loc) {
+    	
 		if (loc != null) {
 		    Date now = new Date();
 		    if (lastTime == null
 			    || now.getTime() / 1000L - lastTime.getTime() / 1000L > interval) {
 		    	
+		    	// if flushMode then onLocationChanged is only used to automatically 
+		    	// activate DB flushing on remote server
+		    	if (flushMode) {
+		    		Log.d(LOGTAG, "Location changed so flush local data to remote server");
+		    		flushLocalStorageToServer(false);
+		    		
+					lastTime = now;
+		    		return;
+		    	}
+
 		    	// save location
 				GiPSExtraData oneGiPSData = new GiPSExtraData();
 				oneGiPSData.key = key;
@@ -755,7 +803,7 @@ public class GeoLocationListener extends Thread implements LocationListener {
 
     @Override
     public void run() {
-		while (isRunning) {
+		while (this.isRunning) {
 		    try {
 		    	Thread.sleep(100);
 		    } catch (Exception e) {

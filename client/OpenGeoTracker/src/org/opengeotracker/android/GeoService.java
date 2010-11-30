@@ -41,10 +41,12 @@ public class GeoService extends Service {
 			Constants.DEFAULT_UPDATE_INTERVAL);
 	
 		// start logging locations
-		Log.d(TAG, "Calling LocationListenerHolder.startLogging(context," + key
+		Log.d(TAG, "Calling LocationListenerHolder.startFlushing(context," + key
 			+ "," + update_interval + "," + url + "," + tag + ")");
-		LocationListenerHolder.startLogging(a, getApplicationContext(), key,
-			update_interval, url, tag, unit);
+		//LocationListenerHolder.startLogging(a, getApplicationContext(), key,
+		//		update_interval, url, tag, unit);
+		LocationListenerHolder.startFlushing(a, getApplicationContext(), key,
+				update_interval, url, tag, unit);
 	
 		// remember that we've started logging
 		isLogging = true;

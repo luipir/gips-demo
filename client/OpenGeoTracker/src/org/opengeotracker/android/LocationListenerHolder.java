@@ -2,7 +2,6 @@ package org.opengeotracker.android;
 
 import android.app.Activity;
 import android.content.Context;
-import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
 
@@ -18,8 +17,7 @@ public class LocationListenerHolder {
     private static LocationManager lm;
     private static GeoLocationListener gll;
     
-    private static Location loc;
-
+    // start logging points peridically
     public static void startLogging(
     		Activity a, 
     		Context ctx, 
@@ -38,7 +36,28 @@ public class LocationListenerHolder {
 		//lm.addGpsStatusListener(gll.gpsListener);
 		gll.start();
     }
-
+    
+    // flushes points archived in DB
+    public static void startFlushing(
+    		Activity a, 
+    		Context ctx, 
+    		String keyId,
+    		int interval, 
+    		String url, 
+    		String tag, 
+    		String unit) {
+		
+    	lm = (LocationManager) ctx.getSystemService(Context.LOCATION_SERVICE);
+		gll = new GeoLocationListener(a, lm, ctx, keyId, interval, url);
+		
+		Log.d(LOGTAG, "Requesting location updates for startFlushing, every "
+			+ interval * 1000 + " millis.");
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,	interval * 1000, 0, gll);
+		//lm.addGpsStatusListener(gll.gpsListener);
+		gll.start();
+    }
+    
+    // record current point in the local db
     public static void pointLogging(
     		Context ctx, 
     		String keyId, 
