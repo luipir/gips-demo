@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">GiPS beta</string>
+	<string name="preferences">Preferences</string>
+	
+	<!-- Button names -->
+	<string name="operator">Operator</string>
+	<string name="trace">Trace</string>
+	<string name="stop">Stop</string>
+	<string name="unknown">Unknown</string>
+	<string name="point">Point</string>
+	<string name="map">Map</string>
+	<string name="list">List</string>
+
+	<string name="distributed">O</string>
+	<string name="distributedMultiple">OM</string>
+	<string name="boxblocked">X</string>
+	<string name="boxunavailable">H</string>
+
+	<!-- Preferences menu elements -->
+	<string name="key_id">Key id</string>
+	<string name="key_id_summary">Your key will be used to identify your data.
+	</string>
+
+	<string name="url">Server URL</string>
+	<string name="url_summary">The URL at which where the server application is
+		installed.</string>
+
+	<string name="nint">Upload interval (seconds)</string>
+	<string name="nint_summary">How many seconds to wait to upload points.</string>
+
+	<string name="offlinemode">Offline mode</string>
+	<string name="offlinemode_enable">Enable offline mode</string>
+	<string name="offlinemode_enable_summary">Save logged positions to the sdcard until upload is
+		enabled
+		again.
+	</string>
+
+	<string name="neverdelete_enable">Keep offline files</string>
+	<string name="neverdelete_enable_summary">Rename uploaded files after uploading, instead of deleting them.
+	</string>
+
+	<string name="startupatboot">Start logging at boot</string>
+	<string name="startupatboot_summary">After starting the device, start logging in the
+		background.</string>
+
+	<string name="vibrate_mode">Vibrate mode</string>
+	<string name="vibrate_enable">Enable vibrate mode</string>
+	<string name="vibrate_enable_summary">Enable phone vibration if successful point sent.</string>
+	<string name="vibrate_interval">Vibrate interval</string>
+	<string name="vibrate_interval_summary">Millisec duration of vibration.</string>
+
+	<string name="chunk">Chunk dimension</string>
+	<string name="chunk_summary">Max number of points to be sent in a single post.</string>
+
+	<string name="unit">Select unit preferences</string>
+	<string name="unit_summary">Would you like to display the distance in
+		kilometers or miles?</string>
+</resources>
